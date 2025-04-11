@@ -1,0 +1,175 @@
+/* General styles */
+body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    background-color: #f4f4f9; /* Soft background color */
+    color: #333;
+    padding: 2rem;
+    max-width: 960px;
+    margin: auto;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #2d3e50; /* Soft dark color */
+    margin: 0;
+    text-align: center;
+}
+
+/* Form container styles */
+.form-container {
+    background-color: #ffffff;
+    padding: 25px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+    border-radius: 12px;
+    max-width: 600px;
+    margin: auto;
+    border-top: 4px solid #6c757d; /* Subtle border */
+}
+
+label {
+    font-size: 1rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-family: "Segoe UI", Roboto, sans-serif;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: #4caf50; /* Green for focus */
+}
+
+button {
+    padding: 0.75rem 1.5rem;
+    background-color: #4caf50; /* Fresh green */
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 0.5rem;
+    margin-bottom: 2rem;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049; /* Slightly darker green */
+}
+
+button:active {
+    background-color: #388e3c; /* Darker green */
+}
+
+/* Output section styles */
+.output-section {
+    background-color: #ffffff;
+    padding: 25px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    border-radius: 12px;
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+h2 {
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: #2d3e50; /* Soft dark color */
+    margin-bottom: 0.5rem;
+}
+
+pre {
+    background-color: #f5f5f5;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    overflow-x: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+/* Footer styles */
+footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+footer a {
+    color: #4caf50; /* Green for the link */
+    text-decoration: none;
+    font-weight: 600;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+
+    button {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    input,
+    textarea {
+        font-size: 1rem;
+    }
+
+    .output-section {
+        margin-top: 15px;
+    }
+
+    pre {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .form-container {
+        padding: 20px;
+    }
+
+    button {
+        width: 100%;
+        padding: 0.75rem 1rem;
+    }
+
+    pre {
+        font-size: 0.85rem;
+    }
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LVM Creator</title>
+    <link rel="icon" href="assets/images/settings-120.png" type="image/png" sizes="120x120">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>LVM Creator</h1>
+    </header>
+
+    <main>
+        <section class="form-container">
+            <label for="disk">Disk</label>
+            <input type="text" id="disk" placeholder="e.g., /dev/mapper/ME4084_www_data">
+
+            <label for="vg">Volume Group</label>
+            <input type="text" id="vg" placeholder="e.g., ME4084_www_data">
+
+            <label for="lv">Logical Volume</label>
+            <input type="text" id="lv" placeholder="e.g., Vol1">
+
+            <label for="mount-point">Mount Point</label>
+            <input type="text" id="mount-point" placeholder="e.g., /mnt/www_data">
+
+            <button id="generate-button">Generate Commands</button>
+        </section>
+
+        <section id="commands-section" class="output-section">
+            <h2>Generated Commands</h2>
+            <pre id="commands-output"></pre>
+        </section>
+
+        <section id="fstab-section" class="output-section">
+            <h2>Fstab Entry</h2>
+            <pre id="fstab-output"></pre>
+        </section>
+
+        <section id="verify-section" class="output-section">
+            <h2>Verification Commands</h2>
+            <pre id="verify-output"></pre>
+        </section>
+
+        <section id="rsync-section" class="output-section">
+            <h2>Data Migration Command</h2>
+            <pre id="rsync-output"></pre>
+        </section>
+    </main>
+
+    <footer>
+        <p>Generated with LVM Creator | &copy; <span id="year"></span> | 
+            <a href="https://github.com/safesploitOrg/lvm-config-creator" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+        </p>
+    </footer>
+    
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>
