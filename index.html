@@ -88,7 +88,7 @@
                     <pre>pvresize /dev/mapper/ME4084_www_data</pre>
 
                     <li><strong>Extend the Logical Volume:</strong> Extend the logical volume to utilize all available free space in the volume group.</li>
-                    <pre>lvextend -l +100%FREE /dev/mapper/ME4084_www_data</pre>
+                    <pre>lvextend -l +100%FREE /dev/ME4084_www_data</pre>
 
                     <li><strong>Mount the Filesystem:</strong> Remount the filesystem after resizing the logical volume.</li>
                     <pre>mount /mnt/www_data</pre>
