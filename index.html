@@ -1,126 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LVM Config Creator</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
-
-    <!-- Add Favicon -->
-    <link rel="icon" href="assets/images/settings-120.png" type="image/png" sizes="120x120">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LVM Config Creator</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="icon" href="assets/images/settings-120.png" type="image/png" sizes="120x120"/>
 </head>
 <body>
-    <header>
-        <h1>LVM Config Creator</h1>
-    </header>
+  <header>
+    <h1>LVM Config Creator</h1>
+  </header>
 
-    <main>
-        <!-- Tab Navigation -->
-        <div class="tab">
-            <button class="tablinks" id="createTab" onclick="openTab(event, 'Create')">Create LVM</button>
-            <button class="tablinks" id="resizeTab" onclick="openTab(event, 'Resize')">Resize LVM</button>
-        </div>
+  <main>
+    <!-- Tab Navigation -->
+    <div class="tab">
+      <button class="tablinks" id="createTab" onclick="openTab(event, 'Create')">Create LVM</button>
+      <button class="tablinks" id="resizeTab" onclick="openTab(event, 'Resize')">Resize LVM</button>
+    </div>
 
-        <!-- Tab Content -->
-        <div id="Create" class="tabcontent">
-            <section class="form-container">
-                <label for="disk">Disk</label>
-                <input type="text" id="disk" placeholder="e.g., /dev/mapper/ME4084_www_data">
+    <!-- Shared Form -->
+    <section class="form-container" id="shared-form">
+      <label for="disk">Disk</label>
+      <input type="text" id="disk" placeholder="e.g., /dev/mapper/ME4084_www_data" />
 
-                <label for="vg">Volume Group</label>
-                <input type="text" id="vg" placeholder="e.g., ME4084_www_data">
+      <label for="vg">Volume Group</label>
+      <input type="text" id="vg" placeholder="e.g., ME4084_www_data" />
 
-                <label for="lv">Logical Volume</label>
-                <input type="text" id="lv" placeholder="e.g., Vol1">
+      <label for="lv">Logical Volume</label>
+      <input type="text" id="lv" placeholder="e.g., Vol1" />
 
-                <label for="mount-point">Mount Point</label>
-                <input type="text" id="mount-point" placeholder="e.g., /mnt/www_data">
+      <div id="mount-point-group">
+        <label for="mount-point">Mount Point</label>
+        <input type="text" id="mount-point" placeholder="e.g., /mnt/www_data" />
+      </div>
 
-                <button id="generate-button">Generate Commands</button>
-            </section>
+      <button id="generate-button">Generate Commands</button>
+    </section>
 
-            <section id="commands-section" class="output-section">
-                <h2>Generated Commands</h2>
-                <pre id="commands-output"></pre>
-            </section>
+    <!-- Create Output -->
+    <div id="Create" class="tabcontent">
+      <section id="commands-section" class="output-section">
+        <h2>Generated Commands</h2>
+        <pre id="commands-output"></pre>
+      </section>
 
-            <section id="fstab-section" class="output-section">
-                <h2>Fstab Entry</h2>
-                <pre id="fstab-output"></pre>
-            </section>
+      <section id="fstab-section" class="output-section">
+        <h2>Fstab Entry</h2>
+        <pre id="fstab-output"></pre>
+      </section>
 
-            <section id="verify-section" class="output-section">
-                <h2>Verification Commands</h2>
-                <pre id="verify-output"></pre>
-            </section>
+      <section id="verify-section" class="output-section">
+        <h2>Verification Commands</h2>
+        <pre id="verify-output"></pre>
+      </section>
 
-            <section id="rsync-section" class="output-section">
-                <h2>Data Migration Command</h2>
-                <pre id="rsync-output"></pre>
-            </section>
-        </div>
+      <section id="rsync-section" class="output-section">
+        <h2>Data Migration Command</h2>
+        <pre id="rsync-output"></pre>
+      </section>
+    </div>
 
-        <div id="Resize" class="tabcontent">
-            <section class="form-container">
-                <h2>Steps to Resize LVM</h2>
+    <!-- Resize Output -->
+    <div id="Resize" class="tabcontent">
+      <section id="resize-output-section" class="output-section">
+        <h2>Resize Commands</h2>
+        <pre id="resize-output"></pre>
+      </section>
 
-                <!-- Steps for resizing -->
-                <ol>
-                    <li><strong>Unmount the Filesystem:</strong> Before modifying the volume, ensure the filesystem is unmounted.</li>
-                    <pre>umount -fl /mnt/www_data</pre>
+      <details class="output-section">
+        <summary><strong>📘 Additional Resize Notes</strong></summary>
+        <ol>
+          <li>Unmount the filesystem before resizing.</li>
+          <li>Resize in SAN GUI if applicable.</li>
+          <li>Rescan:
+            <pre>rescan-scsi-bus.sh -m -s</pre>
+          </li>
+          <li>Restart multipath:
+            <pre>service multipathd restart</pre>
+          </li>
+        </ol>
+      </details>
 
-                    <hr>
-                    <li><strong>(Dell Specific) Resize the SAN Volume:</strong> If resizing the SAN volume, perform the following steps:</li>
-                    <ol>
-                        <li><strong>Resize the SAN Volume:</strong> Unmount volume on sharesX, and resize the volume in the SAN management interface.</li>
-                        <p>Log in to the SAN Management Interface.</p>
-                        <p>Resize the Virtual Volume by the desired amount (e.g., 1.0TiB).</p>
+        <hr>
+        <details class="output-section">
+            <summary><strong>〽️ Dell Specific Resize Notes</strong></summary>
+        <li><strong>(Dell Specific) Resize the SAN Volume:</strong> If resizing the SAN volume, perform the following steps:</li>
+        <ol>
+            <li><strong>Resize the SAN Volume:</strong> Unmount volume on sharesX, and resize the volume in the SAN management interface.</li>
+            <p>Log in to the SAN Management Interface.</p>
+            <p>Resize the Virtual Volume by the desired amount (e.g., 1.0TiB).</p>
 
-                        <li><strong>Rescan the SCSI Bus:</strong> After resizing the SAN volume, rescan the SCSI bus to detect the new size.</li>
-                        <pre>rescan-scsi-bus.sh -m -s</pre>
+            <li><strong>Rescan the SCSI Bus:</strong> After resizing the SAN volume, rescan the SCSI bus to detect the new size.</li>
+            <pre>rescan-scsi-bus.sh -m -s</pre>
 
-                        <li><strong>Restart the Multipath Service:</strong> Restart the multipath service to ensure the system recognizes the new size.</li>
-                        <pre>service multipathd restart</pre>
-                    </ol>
-                    <hr>
+            <li><strong>Restart the Multipath Service:</strong> Restart the multipath service to ensure the system recognizes the new size.</li>
+            <pre>service multipathd restart</pre>
 
-                    <li><strong>Resize the Physical Volume:</strong> Resize the physical volume to use the newly available space.</li>
-                    <pre>pvresize /dev/mapper/ME4084_www_data</pre>
+            <li><strong>Confirm Quota and Filesystem Changes:</strong> Confirm that the quotas and filesystem changes are correct.</li>
+            <pre>quota -g ME4084_www_data</pre>
+            <pre>df -h | grep -i 'ME4084_www_data'</pre>
+        </ol>
+        <hr>
+      </details>
+    </div>
+  </main>
 
-                    <li><strong>Extend the Logical Volume:</strong> Extend the logical volume to utilize all available free space in the volume group.</li>
-                    <pre>lvextend -l +100%FREE /dev/ME4084_www_data</pre>
+  <footer>
+    <p>Generated with LVM Creator | &copy; <span id="year"></span> |
+      <a href="https://github.com/safesploitOrg/lvm-config-creator" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+    </p>
+  </footer>
 
-                    <li><strong>Mount the Filesystem:</strong> Remount the filesystem after resizing the logical volume.</li>
-                    <pre>mount /mnt/www_data</pre>
-
-                    <li><strong>Grow the Filesystem:</strong> Expand the filesystem to use the newly extended logical volume.</li>
-                    <pre>xfs_growfs /mnt/www_data</pre>
-
-                    <hr>
-                    <li><strong>Confirm the Physical Volume Size:</strong> Verify that the physical volume has been resized correctly.</li>
-                    <pre>pvdisplay /dev/mapper/ME4084_www_data</pre>
-
-                    <li><strong>Confirm Quota and Filesystem Changes:</strong> Confirm that the quotas and filesystem changes are correct.</li>
-                    <pre>quota -g ME4084_www_data</pre>
-                    <pre>df -h | grep -i 'ME4084_www_data'</pre>
-                </ol>
-
-                <!-- <button id="resize-button">Generate Resize Commands</button> -->
-            </section>
-
-            <section id="resize-output-section" class="output-section">
-                <h2>Resize Commands</h2>
-                <pre id="resize-output"></pre>
-            </section>
-        </div>
-    </main>
-
-    <footer>
-        <p>Generated with LVM Creator | &copy; <span id="year"></span> | 
-            <a href="https://github.com/safesploitOrg/lvm-config-creator" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
-        </p>
-    </footer>
-
-    <script src="assets/js/script.js"></script>
+  <script src="assets/js/script.js"></script>
 </body>
 </html>

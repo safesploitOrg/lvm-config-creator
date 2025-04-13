@@ -1,111 +1,130 @@
-// Function to open tabs
+let currentMode = 'create'; // default mode
+
+// --- Tab Management ---
 function openTab(evt, tabName) {
-    var i, tabcontent, tablinks;
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
+  const tabcontent = document.getElementsByClassName("tabcontent");
+  for (let i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  const tablinks = document.getElementsByClassName("tablinks");
+  for (let i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " active";
+
+  currentMode = tabName.toLowerCase();
+
+  // Toggle mount point input group
+  const mountPoint = document.getElementById('mount-point').value;
+
+
 }
 
-// Set default tab to "Create"
-document.getElementById("createTab").click();
-
-// Function to generate LVM commands for Create tab
+// --- Command Generators ---
 function generateLVMCommands(disk, vg, lv, mountPoint) {
-    return `
-# LVM commands
+  return `
+# LVM Creation
 pvcreate ${disk}
 vgcreate ${vg} ${disk}
 lvcreate -n ${lv} -l 100%FREE ${vg}
 mkfs.xfs /dev/${vg}/${lv}
 mkdir -p ${mountPoint}
-    `;
+  `;
 }
 
-// Function to generate the fstab entry for Create tab
 function generateFSTABEntry(vg, lv, mountPoint) {
-    return `
-# Fstab entry
-/dev/${vg}/${lv} ${mountPoint} xfs nofail,usrquota,grpquota 0 0
-    `;
+  return `
+# fstab entry
+/dev/${vg}/${lv}        ${mountPoint}          xfs nofail,usrquota,grpquota 0 0
+  `;
 }
 
-// Function to generate verification commands for Create tab
 function generateVerificationCommands(mountPoint) {
-    return `
-# Verify commands
+  return `
+# Reload and Verify
 systemctl daemon-reload
 mount -a
-
-# Confirm mounts
 df -h | grep ${mountPoint}
-    `;
+  `;
 }
 
-// Function to generate rsync migration command for Create tab
 function generateRsyncCommand(mountPoint) {
-    return `
-# Data migration using rsync
+  return `
+# Data Migration (Local)
 rsync -av --delete /oldPath/ ${mountPoint}/
-    `;
+
+# Data Migration (Remote)
+rsync -av --delete /oldPath/ root@remoteHost:${mountPoint}/
+  `;
 }
 
-// Resize LVM function for Resize tab
-function generateResizeCommands(disk, vg, lv) {
-    return `
-# Resize the Physical Volume
+function generateResizeCommands(disk, vg, lv, mountPoint) {
+  const mp = mountPoint || `/mnt/${lv}`;
+  return `
+# Unmount Filesystem
+umount -fl ${mp}
+
+# Resize Physical Volume
 pvresize ${disk}
 
-# Extend the Logical Volume
+# Extend Logical Volume
 lvextend -l +100%FREE /dev/${vg}/${lv}
-    `;
+
+# Grow Filesystem
+xfs_growfs ${mp}
+
+# Remount Filesystem
+mount ${mp}
+
+# Confirm Resize
+df -h | grep ${mp}
+  `;
 }
 
-// Event listener for "Create LVM" button
-document.getElementById('generate-button').addEventListener('click', function () {
-    const disk = document.getElementById('disk').value;
-    const vg = document.getElementById('vg').value;
-    const lv = document.getElementById('lv').value;
-    const mountPoint = document.getElementById('mount-point').value;
+// --- Shared Handler ---
+function generateCommands(mode) {
+  const disk = document.getElementById('disk').value;
+  const vg = document.getElementById('vg').value;
+  const lv = document.getElementById('lv').value;
+  const mountPoint = document.getElementById('mount-point').value;
 
-    // Generate LVM commands for Create
-    const lvmCommands = generateLVMCommands(disk, vg, lv, mountPoint);
-    const fstabEntry = generateFSTABEntry(vg, lv, mountPoint);
-    const verifyCommands = generateVerificationCommands(mountPoint);
-    const rsyncCommand = generateRsyncCommand(mountPoint);
+  if (mode === 'create') {
+    document.getElementById('commands-output').textContent = generateLVMCommands(disk, vg, lv, mountPoint);
+    document.getElementById('fstab-output').textContent = generateFSTABEntry(vg, lv, mountPoint);
+    document.getElementById('verify-output').textContent = generateVerificationCommands(mountPoint);
+    document.getElementById('rsync-output').textContent = generateRsyncCommand(mountPoint);
+  }
 
-    // Display generated commands
-    document.getElementById('commands-output').textContent = lvmCommands;
-    document.getElementById('fstab-output').textContent = fstabEntry;
-    document.getElementById('verify-output').textContent = verifyCommands;
-    document.getElementById('rsync-output').textContent = rsyncCommand;
-});
+  if (mode === 'resize') {
+    const mp = mountPoint || `/mnt/${lv}`;
+    document.getElementById('resize-output').textContent = generateResizeCommands(disk, vg, lv, mp);
+  }
+}
 
-// Event listener for "Resize LVM" button
-document.getElementById('resize-button').addEventListener('click', function () {
-    const disk = document.getElementById('resize-disk').value;
-    const vg = document.getElementById('resize-vg').value;
-    const lv = document.getElementById('resize-lv').value;
+// --- Initialisers ---
+function initSharedForm() {
+  document.getElementById('generate-button').addEventListener('click', () => {
+    // generateCommands(currentMode);
 
-    // Generate Resize LVM commands
-    const resizeCommands = generateResizeCommands(disk, vg, lv);
+    // Generate for both 'create' and 'resize'
+    generateCommands('create');
+    generateCommands('resize');
+  });
+}
 
-    // Display generated commands for resizing
-    document.getElementById('resize-output').textContent = resizeCommands;
-});
-
-// Set Footer Year
 function setFooterYear() {
-    const year = new Date().getFullYear();
-    document.getElementById('year').textContent = year;
+  const year = new Date().getFullYear();
+  document.getElementById('year').textContent = year;
 }
 
-window.onload = () => {
-    setFooterYear();
-};
+function main() {
+  setFooterYear();
+  initSharedForm();
+  document.getElementById("createTab").click(); // default tab
+}
+
+// --- Run ---
+main();
