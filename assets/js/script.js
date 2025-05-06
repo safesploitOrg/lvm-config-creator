@@ -73,11 +73,11 @@ pvresize ${disk}
 # Extend Logical Volume
 lvextend -l +100%FREE /dev/${vg}/${lv}
 
-# Grow Filesystem
-xfs_growfs ${mp}
-
 # Remount Filesystem
 mount ${mp}
+
+# Grow Filesystem (once mounted)
+xfs_growfs ${mp}
 
 # Confirm Resize
 df -h | grep ${mp}
